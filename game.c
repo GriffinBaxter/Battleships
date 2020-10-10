@@ -238,7 +238,8 @@ uint8_t movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
 }
 
 
-char setupPlayerOrder() {
+char setupPlayerOrder()
+{
     char playerNum = 0;
 
     if (ir_uart_read_ready_p()) {
@@ -248,7 +249,7 @@ char setupPlayerOrder() {
     if (playerNum == 0) {
         while (1) {
             ir_uart_putc(1);
-            
+
             if (ir_uart_read_ready_p()) {
                 if (ir_uart_getc() == 0) {
                     break;
@@ -258,8 +259,80 @@ char setupPlayerOrder() {
     } else {
         ir_uart_putc(0);
     }
-    
+
     return playerNum;
+}
+
+
+void shoot(uint8_t* playerNum, uint8_t* shotRow, uint8_t* shotCol)
+{
+    uint8_t currentRow = 6;
+    uint8_t currentCol = 0;
+    
+    ledmat_init();
+    pacer_init(500);
+    
+    while (1) {
+        pacer_wait();
+        
+        pio_output_low(rows[currentRow]);
+        pio_output_low(cols[currentCol]);
+        
+        navswitch_update();
+        
+        if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+            if (currentRow != 0) {
+                pio_output_high(rows[currentRow]);
+                currentRow--;
+            }
+        }
+        
+        if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
+            if (currentRow != 6) {
+                pio_output_high(rows[currentRow]);
+                currentRow++;
+            }
+        }
+        
+        if (navswitch_push_event_p(NAVSWITCH_EAST)) {
+            if (currentCol != 4) {
+                pio_output_high(cols[currentCol]);
+                currentCol++;
+            }
+        }
+        
+        if (navswitch_push_event_p(NAVSWITCH_WEST)) {
+            if (currentCol != 0) {
+                pio_output_high(cols[currentCol]);
+                currentCol--;
+            }
+        }
+        
+        if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+            pio_output_high(rows[currentRow]);
+            pio_output_high(cols[currentCol]);
+            
+            *shotRow = currentRow;
+            *shotCol = currentCol;
+            
+            break;
+        }
+    }
+    
+    *playerNum = 1;
+}
+
+
+void waitTurn(uint8_t* playerNum, uint8_t* shotRow, uint8_t* shotCol)
+{
+    while (1) {
+        if (ir_uart_read_ready_p()) {
+            *shotRow = ir_uart_getc();
+            playerNum = 0;
+            break;
+        }
+    }
+    *playerNum = 0;
 }
 
 
@@ -279,10 +352,20 @@ int main(void)
 
     // below onwards, not tested properly yet
 
-    char playerNum = setupPlayerOrder();
+    uint8_t playerNum = setupPlayerOrder();
     
-    // will change to a condition rather than infinite loop
+    // TEST
+    //uint8_t playerNum = 0;
+    
+    uint8_t shotRow = 0;
+    uint8_t shotCol = 0;
+
+    // will change to a "end game" condition rather than infinite loop
     while (1) {
-        
+        if (playerNum == 0) {
+            shoot(&playerNum, &shotRow, &shotCol);
+        } else {
+            waitTurn(&playerNum, &shotRow, &shotCol);
+        }
     }
 }
