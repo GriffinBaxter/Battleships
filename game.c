@@ -6,6 +6,8 @@
 #include "pio.h"
 #include "button.h"
 #include "ir_uart.h"
+#include "tinygl.h"
+#include "../../fonts/font5x7_1.h"
 
 #define BUTTON_PIO PD7_PIO
 
@@ -264,7 +266,7 @@ char setupPlayerOrder()
 }
 
 
-void shoot(uint8_t* playerNum, uint8_t* shotRow, uint8_t* shotCol)
+void shoot(uint8_t* shotRow, uint8_t* shotCol)
 {
     uint8_t currentRow = 6;
     uint8_t currentCol = 0;
@@ -318,21 +320,89 @@ void shoot(uint8_t* playerNum, uint8_t* shotRow, uint8_t* shotCol)
             break;
         }
     }
-    
-    *playerNum = 1;
 }
 
 
-void waitTurn(uint8_t* playerNum, uint8_t* shotRow, uint8_t* shotCol)
+void sendPos(uint8_t* shotRow, uint8_t* shotCol)
+{
+    ir_uart_putc(*shotRow);
+    // delay is probably needed here.
+    ir_uart_putc(*shotCol);
+}
+
+
+void waitHitConfirmation()
+{
+    while (1) {
+        if (ir_uart_read_ready_p()) {
+            tinygl_clear();
+            if (ir_uart_getc() == 1) {
+                displayText("HIT!");
+            } else {
+                displayText("MISS");
+            }
+            break;
+        }
+    }
+}
+
+
+void displayText(char* text)
+{
+    tinygl_init (500);
+    tinygl_font_set (&font5x7_1);
+    tinygl_text_speed_set (10);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text(text);
+    
+    pacer_init (500);
+
+    uint16_t count = 0;
+
+    while(1)
+    {
+        pacer_wait();
+        tinygl_update();
+        
+        if (count++ >= 2500) {
+            break;
+        }
+    }
+    
+    clearScreen();
+}
+
+
+void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
 {
     while (1) {
         if (ir_uart_read_ready_p()) {
             *shotRow = ir_uart_getc();
-            playerNum = 0;
             break;
         }
     }
-    *playerNum = 0;
+    *shotCol = ir_uart_getc();
+}
+
+
+void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipPos4, uint8_t* shipPos3, uint8_t* shipPos2)
+{
+    // need to implement check for if ship has been hit
+    if (1) {
+        ir_uart_putc(1);
+    } else {
+        ir_uart_putc(0);
+    }
+}
+
+
+void changePlayerNum(uint8_t* playerNum)
+{
+    if (*playerNum == 0) {
+        *playerNum = 1;
+    } else {
+        *playerNum = 0;
+    }
 }
 
 
@@ -346,9 +416,9 @@ int main(void)
     // ships
     uint8_t frame1[5] = {0, 0, 0, 0, 0};
 
-    uint8_t shipPosition4 = movePlaceShip(4, frame1);
-    uint8_t shipPosition3 = movePlaceShip(3, frame1);
-    uint8_t shipPosition2 = movePlaceShip(2, frame1);
+    uint8_t shipPos4 = movePlaceShip(4, frame1);
+    uint8_t shipPos3 = movePlaceShip(3, frame1);
+    uint8_t shipPos2 = movePlaceShip(2, frame1);
 
     // below onwards, not tested properly yet
 
@@ -363,9 +433,13 @@ int main(void)
     // will change to a "end game" condition rather than infinite loop
     while (1) {
         if (playerNum == 0) {
-            shoot(&playerNum, &shotRow, &shotCol);
+            shoot(&shotRow, &shotCol);
+            sendPos(&shotRow, &shotCol);
+            waitHitConfirmation();
         } else {
-            waitTurn(&playerNum, &shotRow, &shotCol);
+            waitTurn(&shotRow, &shotCol);
+            checkHit(&shotRow, &shotCol, &shipPos4, &shipPos3, &shipPos2);
         }
+        changePlayerNum(&playerNum);
     }
 }
