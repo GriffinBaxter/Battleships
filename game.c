@@ -11,16 +11,16 @@
 
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t rows[] = {
-        LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
-        LEDMAT_ROW4_PIO, LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO,
-        LEDMAT_ROW7_PIO
+    LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
+    LEDMAT_ROW4_PIO, LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO,
+    LEDMAT_ROW7_PIO
 };
 
 
 /** Define PIO pins driving LED matrix columns.  */
 static const pio_t cols[] = {
-        LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
-        LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
+    LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
+    LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
 };
 
 static void display_column(uint8_t row_pattern, uint8_t current_column)
@@ -152,14 +152,15 @@ static void moveShipRight(uint8_t *frame, uint8_t *position)
 static char checkFrameCollision(uint8_t *frame1, uint8_t *frame2)
 {
     for (int i = 0; i < 5; i++) {
-        if ((frame1[i] & frame2[i]) != 0)
+        if ((frame1[i] & frame2[i]) != 0) {
             return 1;
+        }
     }
     return 0;
 }
 
 
-uint8_t movePlaceShip(int shipLength, uint8_t *shipFrame)
+uint8_t movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
 {
     ledmat_init();
     pacer_init(500);
@@ -219,10 +220,11 @@ uint8_t movePlaceShip(int shipLength, uint8_t *shipFrame)
 
         display_column(frame2[current_column], current_column);
 
-        if (checkFrameCollision(shipFrame, frame2))
+        if (checkFrameCollision(shipFrame, frame2)) {
             led_set(0, 0);
-        else
+        } else {
             led_set(0, 1);
+        }
 
         if (pio_input_get(BUTTON_PIO) && !checkFrameCollision(shipFrame, frame2)) {
             for (int i = 0; i < 5; i++) {
@@ -233,6 +235,31 @@ uint8_t movePlaceShip(int shipLength, uint8_t *shipFrame)
     }
 
     return shipPosition;
+}
+
+
+char setupPlayerOrder() {
+    char playerNum = 0;
+
+    if (ir_uart_read_ready_p()) {
+        playerNum = ir_uart_getc();
+    }
+
+    if (playerNum == 0) {
+        while (1) {
+            ir_uart_putc(1);
+            
+            if (ir_uart_read_ready_p()) {
+                if (ir_uart_getc() == 0) {
+                    break;
+                }
+            }
+        }
+    } else {
+        ir_uart_putc(0);
+    }
+    
+    return playerNum;
 }
 
 
@@ -250,15 +277,12 @@ int main(void)
     uint8_t shipPosition3 = movePlaceShip(3, frame1);
     uint8_t shipPosition2 = movePlaceShip(2, frame1);
 
-    uint8_t enemyShipPosition4 = 0;
+    // below onwards, not tested properly yet
 
-    // send and retrieve the first ship position, not working correctly or tested yet
+    char playerNum = setupPlayerOrder();
+    
+    // will change to a condition rather than infinite loop
     while (1) {
-        ir_uart_putc((char) shipPosition4);
-
-        if (ir_uart_read_ready_p()) {
-            enemyShipPosition4 = ir_uart_getc();
-            break;
-        }
+        
     }
 }
