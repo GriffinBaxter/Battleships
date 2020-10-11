@@ -162,7 +162,7 @@ static char checkFrameCollision(uint8_t *frame1, uint8_t *frame2)
 }
 
 
-uint8_t movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
+void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
 {
     ledmat_init();
     pacer_init(500);
@@ -235,8 +235,6 @@ uint8_t movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
             break;
         }
     }
-
-    return shipPosition;
 }
 
 
@@ -386,7 +384,7 @@ void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
 }
 
 
-void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipPos4, uint8_t* shipPos3, uint8_t* shipPos2)
+void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* frame1)
 {
     // need to implement check for if ship has been hit
     if (1) {
@@ -417,9 +415,9 @@ int main(void)
     // ships
     uint8_t frame1[5] = {0, 0, 0, 0, 0};
 
-    uint8_t shipPos4 = movePlaceShip(4, frame1);
-    uint8_t shipPos3 = movePlaceShip(3, frame1);
-    uint8_t shipPos2 = movePlaceShip(2, frame1);
+    movePlaceShip(4, frame1);
+    movePlaceShip(3, frame1);
+    movePlaceShip(2, frame1);
 
     // below onwards, not tested properly yet
 
@@ -439,7 +437,7 @@ int main(void)
             waitHitConfirmation();
         } else {
             waitTurn(&shotRow, &shotCol);
-            checkHit(&shotRow, &shotCol, &shipPos4, &shipPos3, &shipPos2);
+            checkHit(&shotRow, &shotCol, &frame1);
         }
         changePlayerNum(&playerNum);
     }
