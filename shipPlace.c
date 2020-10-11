@@ -237,7 +237,8 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
             led_set(0, 1);
         }
 
-        if (pio_input_get(BUTTON_PIO) && !checkFrameCollision(shipMask, currentShipMask)) {
+        button_update();
+        if (button_push_event_p(0) && !checkFrameCollision(shipMask, currentShipMask)) {
             for (int i = 0; i < 5; i++) {
                 shipMask[i] |= currentShipMask[i];
             }
