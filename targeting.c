@@ -32,7 +32,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
         clearScreen();
 
         // display dead bits of ship
-        display_column(shipMask[current_column] & enemyHitMask[current_column], current_column);
+        displayColumn(shipMask[current_column] & enemyHitMask[current_column], current_column);
         clearScreen();
 
         current_column++;
@@ -47,7 +47,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
         }
 
         // display alive bits of ship
-        display_column(shipMask[current_column] & ~(enemyHitMask[current_column]), current_column);
+        displayColumn(shipMask[current_column] & ~(enemyHitMask[current_column]), current_column);
     }
 }
 
@@ -128,7 +128,7 @@ void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask, uint8_t* shipM
             viewShips(shipMask, enemyHitMask);
         }
 
-        display_column(shotMask[currentMaskDisplayColumn], currentMaskDisplayColumn);
+        displayColumn(shotMask[currentMaskDisplayColumn], currentMaskDisplayColumn);
         clearScreen();
 
         if ((shotMask[currentCol] >> currentRow) & 1) {

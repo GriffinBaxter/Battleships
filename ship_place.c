@@ -148,7 +148,7 @@ void moveShipRight(uint8_t *mask, uint8_t *position)
  * @param mask2 the second mask to compare
  * @return 1 if a collision is detected else 0
  */
-char checkFrameCollision(uint8_t *mask1, uint8_t *mask2)
+char checkBitmaskCollision(uint8_t *mask1, uint8_t *mask2)
 {
     for (int i = 0; i < 5; i++) {
         if ((mask1[i] & mask2[i]) != 0) {
@@ -170,7 +170,7 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
     pacer_init(500);
 
     //led_set(0, 1);
-    uint8_t current_column = 0;
+    uint8_t currentColumn = 0;
 
     //bright frame
     uint8_t currentShipMask[5] = {0, 0, 0, 0, 0};
@@ -186,9 +186,9 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
         pacer_wait();
 
         clearScreen();
-        current_column++;
-        if (current_column > 4) {
-            current_column = 0;
+        currentColumn++;
+        if (currentColumn > 4) {
+            currentColumn = 0;
         }
 
         navswitch_update();
@@ -217,19 +217,19 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
         }
 
         // Display shipFrame for a split second so that it is very dim
-        display_column(shipMask[current_column], current_column);
+        displayColumn(shipMask[currentColumn], current_column);
         clearScreen();
 
-        display_column(currentShipMask[current_column], current_column);
+        displayColumn(currentShipMask[currentColumn], current_column);
 
-        if (checkFrameCollision(shipMask, currentShipMask)) {
+        if (checkBitmaskCollision(shipMask, currentShipMask)) {
             led_set(0, 0);
         } else {
             led_set(0, 1);
         }
 
         button_update();
-        if (button_push_event_p(0) && !checkFrameCollision(shipMask, currentShipMask)) {
+        if (button_push_event_p(0) && !checkBitmaskCollision(shipMask, currentShipMask)) {
             for (int i = 0; i < 5; i++) {
                 shipMask[i] |= currentShipMask[i];
             }

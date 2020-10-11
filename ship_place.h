@@ -58,7 +58,7 @@ void moveShipRight(uint8_t *mask, uint8_t *position);
  * @param mask2 the second mask to compare
  * @return 1 if a collision is detected else 0
  */
-char checkFrameCollision(uint8_t *mask1, uint8_t *mask2);
+char checkBitmaskCollision(uint8_t *mask1, uint8_t *mask2);
 
 /**
  * Renders the ship the user is placing as well as previously placed ships and allows the user to move the current ship

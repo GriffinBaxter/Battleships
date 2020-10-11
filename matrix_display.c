@@ -30,26 +30,26 @@ const pio_t cols[] = {
 
 /**
  * Displays a given pattern on a given row of the LED mat
- * @param row_pattern bit pattern to display
- * @param current_column the current column that is being displayed
+ * @param rowPattern bit pattern to display
+ * @param currentColumn the current column that is being displayed
  */
-void display_column(uint8_t row_pattern, uint8_t current_column)
+void displayColumn(uint8_t rowPattern, uint8_t currentColumn)
 {
-    if (current_column == 0) {
+    if (currentColumn == 0) {
         pio_output_high(cols[4]);
     } else {
-        pio_output_high(cols[current_column - 1]);
+        pio_output_high(cols[currentColumn - 1]);
     }
 
-    if (!(row_pattern << 1)) {
+    if (!(rowPattern << 1)) {
         return;
     }
 
     for (int i = 0; i < 7; i++) {
-        (row_pattern >> i) & 1 ? pio_output_low(rows[i]) : pio_output_high(rows[i]);
+        (rowPattern >> i) & 1 ? pio_output_low(rows[i]) : pio_output_high(rows[i]);
     }
 
-    pio_output_low(cols[current_column]);
+    pio_output_low(cols[currentColumn]);
 }
 
 /**
