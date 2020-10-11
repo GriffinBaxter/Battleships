@@ -11,6 +11,10 @@
 
 #define BUTTON_PIO PD7_PIO
 
+#define SHIP1_LENGTH 4
+#define SHIP2_LENGTH 3
+#define SHIP3_LENGTH 2
+
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t rows[] = {
         LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
@@ -60,11 +64,11 @@ static void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
     //ship is horizontal
     if (!(*position >> 7)) {
         // is the ship out of the left bound?
-        if ((length == 3 || length == 4) && *position % 5 == 0) {
+        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position % 5 == 0) {
             *position += 1;
-        } else if ((length == 2 || length == 3) && *position % 5 == 4) {
+        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position % 5 == 4) {
             *position -= 1;
-        } else if (length == 4 && *position % 5 >= 3) {
+        } else if (length == SHIP3_LENGTH && *position % 5 >= 3) {
             *position -= 3 - (5 - (*position % 5));
         }
         if (length == 2) {
@@ -78,11 +82,11 @@ static void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
         }
     } else { /* Ship is vertical */
         // is the ship out of the top bound
-        if ((length == 3 || length == 4) && *position - 128 < 5) {
+        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position - 128 < 5) {
             *position += 5;
-        } else if ((length == 2 || length == 3) && *position - 128 > 29) {
+        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position - 128 > 29) {
             *position -= 5;
-        } else if (length == 4 && *position - 128 > 24) {
+        } else if (length == SHIP1_LENGTH && *position - 128 > 24) {
             *position -= 5 * (3 - (7 - ((*position - 128) / 5)));
         }
         if (length == 2) {
@@ -433,9 +437,9 @@ int main(void)
 
     uint8_t shotMask[5] = {0, 0, 0, 0, 0};
 
-    movePlaceShip(4, shipMask);
-    movePlaceShip(3, shipMask);
-    movePlaceShip(2, shipMask);
+    movePlaceShip(SHIP1_LENGTH, shipMask);
+    movePlaceShip(SHIP2_LENGTH, shipMask);
+    movePlaceShip(SHIP3_LENGTH, shipMask);
 
     // below onwards, not tested properly yet
 
