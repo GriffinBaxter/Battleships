@@ -12,6 +12,7 @@
 #include "ship_place.h"
 #include "matrix_display.h"
 #include "targeting.h"
+#include "waiting.h"
 
 #define NUM_HIT_WIN 9
 
@@ -45,62 +46,6 @@ char setupPlayerOrder(void)
 void sendPos(uint8_t *shotRow, uint8_t *shotCol)
 {
     ir_uart_putc(*shotRow * 5 + *shotCol);
-}
-
-
-void displayText(char *text)
-{
-    tinygl_init(500);
-    tinygl_font_set(&font5x7_1);
-    tinygl_text_speed_set(10);
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text(text);
-
-    pacer_init(500);
-
-    uint16_t count = 0;
-
-    while (1) {
-        pacer_wait();
-        tinygl_update();
-
-        if (count++ >= 2500) {
-            break;
-        }
-    }
-
-    clearScreen();
-}
-
-
-void waitHitConfirmation(uint8_t* numHits)
-{
-    while (1) {
-        if (ir_uart_read_ready_p()) {
-            tinygl_clear();
-            if (ir_uart_getc() == 1) {
-                displayText("HIT!");
-                *numHits += 1;
-            } else {
-                displayText("MISS");
-            }
-            break;
-        }
-    }
-}
-
-
-void waitTurn(uint8_t *shotRow, uint8_t *shotCol)
-{
-    uint8_t rowCol = 0;
-    while (1) {
-        if (ir_uart_read_ready_p()) {
-            rowCol = ir_uart_getc();
-            break;
-        }
-    }
-    *shotRow = rowCol / 5;
-    *shotCol = rowCol % 5;
 }
 
 
@@ -174,6 +119,6 @@ int main(void)
     if (numHits == NUM_HIT_WIN) {
         displayText("WIN!");
     } else {
-        displayText("LOSS!");
+        displayText("LOSS");
     }
 }

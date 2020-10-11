@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../drivers/avr/timer.h ../../drivers/ledmat.h ../../drivers/button.h ../../drivers/led.h ../../drivers/navswitch.h ship_place.h matrix_display.h targeting.h
+game.o: game.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../drivers/avr/timer.h ../../drivers/ledmat.h ../../drivers/button.h ../../drivers/led.h ../../drivers/navswitch.h ship_place.h matrix_display.h targeting.h waiting.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -73,9 +73,12 @@ matrix_display.o: matrix_display.c ../../drivers/avr/pio.h ../../drivers/avr/sys
 targeting.o: targeting.c ../../drivers/avr/pio.h ../../drivers/avr/system.h targeting.h matrix_display.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+waiting.o: waiting.c ../../drivers/avr/pio.h ../../drivers/avr/system.h waiting.h matrix_display.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o pio.o pacer.o timer.o ledmat.o button.o led.o navswitch.o ir_uart.o usart1.o timer0.o prescale.o tinygl.o font.o display.o ship_place.o matrix_display.o targeting.o
+game.out: game.o system.o pio.o pacer.o timer.o ledmat.o button.o led.o navswitch.o ir_uart.o usart1.o timer0.o prescale.o tinygl.o font.o display.o ship_place.o matrix_display.o targeting.o waiting.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

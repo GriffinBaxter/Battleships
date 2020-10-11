@@ -14,4 +14,6 @@ void display_column(uint8_t row_pattern, uint8_t current_column);
 
 void clearScreen(void);
 
+void displayText(char *text);
+
 #endif

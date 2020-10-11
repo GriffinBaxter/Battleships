@@ -55,3 +55,28 @@ void clearScreen(void)
         pio_output_high(cols[i]);
     }
 }
+
+
+void displayText(char *text)
+{
+    tinygl_init(500);
+    tinygl_font_set(&font5x7_1);
+    tinygl_text_speed_set(10);
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text(text);
+
+    pacer_init(500);
+
+    uint16_t count = 0;
+
+    while (1) {
+        pacer_wait();
+        tinygl_update();
+
+        if (count++ >= 2500) {
+            break;
+        }
+    }
+
+    clearScreen();
+}
