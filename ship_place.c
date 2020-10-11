@@ -32,7 +32,7 @@ void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
         } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position % TOTAL_COLS == TOTAL_COLS - 1) {
             *position -= 1;
         } else if (length == SHIP3_LENGTH && *position % TOTAL_COLS >= TOTAL_COLS - 2) {
-            *position -= 3 - (MAX-TOTAL_COLS - (*position % TOTAL_COLS));
+            *position -= 3 - (TOTAL_COLS - (*position % TOTAL_COLS));
         }
         if (length == SHIP3_LENGTH) {
             for (int i = *position % TOTAL_COLS; i < length + (*position % TOTAL_COLS); i++) {
@@ -217,10 +217,10 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
         }
 
         // Display shipFrame for a split second so that it is very dim
-        displayColumn(shipMask[currentColumn], current_column);
+        displayColumn(shipMask[currentColumn], currentColumn);
         clearScreen();
 
-        displayColumn(currentShipMask[currentColumn], current_column);
+        displayColumn(currentShipMask[currentColumn], currentColumn);
 
         if (checkBitmaskCollision(shipMask, currentShipMask)) {
             led_set(0, 0);

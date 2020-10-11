@@ -15,7 +15,7 @@
 /**
  * Waits until the UCFK receives confirmation from the other UCFK about whether the fired shot hit or missed
  * @param numHits pointer to number of successful hits, incremented if hit is confirmed
- */TOTAL_COLS
+ */
 void waitHitConfirmation(uint8_t* numHits);
 
 /**
