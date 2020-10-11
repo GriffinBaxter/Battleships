@@ -16,7 +16,7 @@
 #define SHIP2_LENGTH 3
 #define SHIP3_LENGTH 2
 
-#define NUM_HIT_WIN 2
+#define NUM_HIT_WIN 9
 
 
 char setupPlayerOrder(void)
@@ -44,8 +44,37 @@ char setupPlayerOrder(void)
     return playerNum;
 }
 
+void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask){
+    pacer_init(500);
+    uint8_t current_column = 0;
+    clearScreen();
 
-void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask)
+    while (1){
+        pacer_wait();
+        clearScreen();
+
+        // display dead bits of ship
+        display_column(shipMask[current_column] & enemyHitMask[current_column], current_column);
+        clearScreen();
+
+        current_column++;
+        if (current_column > 4) {
+            current_column = 0;
+        }
+
+        button_update();
+        if (button_push_event_p(0)){
+            clearScreen();
+            break;
+        }
+
+        // display alive bits of ship
+        display_column(shipMask[current_column] & ~(enemyHitMask[current_column]), current_column);
+    }
+}
+
+
+void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask, uint8_t* shipMask, uint8_t* enemyHitMask)
 {
     uint8_t currentRow = 6;
     uint8_t currentCol = 0;
@@ -108,6 +137,10 @@ void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask)
             break;
         }
 
+        button_update();
+        if (button_push_event_p(0)){
+            viewShips(shipMask, enemyHitMask);
+        }
 
         display_column(shotMask[currentMaskDisplayColumn], currentMaskDisplayColumn);
         clearScreen();
@@ -208,6 +241,7 @@ int main(void)
 {
     led_init();
     navswitch_init();
+    button_init();
     pio_config_set(BUTTON_PIO, PIO_INPUT);
     ir_uart_init();
 
@@ -215,6 +249,7 @@ int main(void)
     uint8_t shipMask[5] = {0, 0, 0, 0, 0};
 
     uint8_t shotMask[5] = {0, 0, 0, 0, 0};
+    uint8_t enemyShotMask[5] = {0, 0, 0, 0, 0};
 
     movePlaceShip(SHIP1_LENGTH, shipMask);
     movePlaceShip(SHIP2_LENGTH, shipMask);
@@ -237,12 +272,13 @@ int main(void)
     while (numHits != NUM_HIT_WIN && enemyHits != NUM_HIT_WIN) {
         clearScreen();
         if (playerNum == 0) {
-            shoot(&shotRow, &shotCol, shotMask);
+            shoot(&shotRow, &shotCol, shotMask, shipMask, enemyShotMask);
             shotMask[shotCol] |= (1 << shotRow);
             sendPos(&shotRow, &shotCol);
             waitHitConfirmation(&numHits);
         } else {
             waitTurn(&shotRow, &shotCol);
+            enemyShotMask[shotCol] |= (1 << shotRow);
             checkHit(&shotRow, &shotCol, shipMask, &enemyHits);
         }
         changePlayerNum(&playerNum);
