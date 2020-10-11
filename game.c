@@ -386,7 +386,7 @@ void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
 
 void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* frame1)
 {
-    ir_uart_putc(frame1[*shotCol] >> *shotRow);
+    ir_uart_putc((frame1[*shotCol] >> *shotRow) & 1);
 }
 
 
