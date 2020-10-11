@@ -4,6 +4,7 @@
 #include "navswitch.h"
 #include "ledmat.h"
 #include "led.h"
+#include "pacer.h"
 #include "button.h"
 #include "ir_uart.h"
 
