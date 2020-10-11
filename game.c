@@ -13,7 +13,10 @@
 
 #define NUM_HIT_WIN 9
 
-
+/**
+ * Determines if this UCFK is player 0 or player 1 by communicating with another UCFK
+ * @return resulting player number
+ */
 char setupPlayerOrder(void)
 {
     char playerNum = 0;
@@ -39,13 +42,23 @@ char setupPlayerOrder(void)
     return playerNum;
 }
 
-
+/**
+ * Sends given shot position to another UCFK via the IR Transmitter
+ * @param shotRow pointer to value of shot row
+ * @param shotCol pointer to value of shot column
+ */
 void sendPos(uint8_t *shotRow, uint8_t *shotCol)
 {
     ir_uart_putc(*shotRow * 5 + *shotCol);
 }
 
-
+/**
+ * Checks the given shot row and column to deduce whether a shot has hit a ship
+ * @param shotRow pointer to value of shot row
+ * @param shotCol pointer to value of shot column
+ * @param shipMask bitmask of the player's ships on the display
+ * @param enemyHits pointer to value of successful enemy hits
+ */
 void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipMask, uint8_t* enemyHits)
 {
     uint8_t hit = (shipMask[*shotCol] >> *shotRow) & 1;
@@ -55,7 +68,10 @@ void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipMask, uint8_t* en
     }
 }
 
-
+/**
+ * Toggles the player's number
+ * @param playerNum pointer to the value of the player's number
+ */
 void changePlayerNum(uint8_t *playerNum)
 {
     if (*playerNum == 0) {
@@ -65,7 +81,10 @@ void changePlayerNum(uint8_t *playerNum)
     }
 }
 
-
+/**
+ * Main method. this is the entry point of the program
+ * @return program exit code
+ */
 int main(void)
 {
     led_init();

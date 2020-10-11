@@ -19,6 +19,11 @@ const pio_t cols[] = {
         LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
 };
 
+/**
+ * Displays a given pattern on a given row of the LED mat
+ * @param row_pattern bit pattern to display
+ * @param current_column the current column that is being displayed
+ */
 void display_column(uint8_t row_pattern, uint8_t current_column)
 {
     if (current_column == 0) {
@@ -38,7 +43,9 @@ void display_column(uint8_t row_pattern, uint8_t current_column)
     pio_output_low(cols[current_column]);
 }
 
-
+/**
+ * Sets all LED mat rows and column to PIO signal high
+ */
 void clearScreen(void)
 {
     for (int i = 0; i < 7; i++) {
@@ -50,7 +57,10 @@ void clearScreen(void)
     }
 }
 
-
+/**
+ * Displays a scrolling string on the LED mat
+ * @param text the string to display
+ */
 void displayText(char *text)
 {
     tinygl_init(500);
