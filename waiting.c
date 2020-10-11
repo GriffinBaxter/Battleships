@@ -1,8 +1,17 @@
+/**
+ * @file   waiting.c
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions regarding waiting for the
+ * other player to shoot their shot at one of your ships, and
+ * subsequently displaying a hit confirmation for a fired hit.
+ */
+
 #include "waiting.h"
 #include "matrix_display.h"
-
 #include "ir_uart.h"
 #include "tinygl.h"
+
 
 /**
  * Waits until the UCFK receives confirmation from the other UCFK about whether the fired shot hit or missed

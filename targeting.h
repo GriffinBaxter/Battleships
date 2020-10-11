@@ -1,3 +1,12 @@
+/**
+ * @file   targeting.h
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions regarding the targeting for
+ * shooting the other player's ships and viewing your own ships and
+ * their currently inflicted hits.
+ */
+
 #ifndef TARGETING_H
 #define TARGETING_H
 

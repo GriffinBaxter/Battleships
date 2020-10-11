@@ -1,3 +1,12 @@
+/**
+ * @file   waiting.h
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions regarding waiting for the
+ * other player to shoot their shot at one of your ships, and
+ * subsequently displaying a hit confirmation for a fired hit.
+ */
+
 #ifndef WAITING_H
 #define WAITING_H
 

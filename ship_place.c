@@ -1,11 +1,19 @@
+/**
+ * @file   ship_place.c
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions regarding the moving and
+ * placement of ships during the setup phase of the game.
+ */
+
 #include "ship_place.h"
 #include "matrix_display.h"
-
 #include "navswitch.h"
 #include "ledmat.h"
 #include "led.h"
 #include "pacer.h"
 #include "button.h"
+
 
 /**
  * Places ship of given length and given position in given bitmask, ensuring that the given position is valid and would

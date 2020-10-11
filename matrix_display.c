@@ -1,9 +1,18 @@
-#include "matrix_display.h"
+/**
+ * @file   matrix_display.c
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions and constants regarding the
+ * matrix display, which is used for displaying ships, shot markers and
+ * text.
+ */
 
+#include "matrix_display.h"
 #include "ledmat.h"
 #include "pacer.h"
 #include "tinygl.h"
 #include "../../fonts/font5x7_1.h"
+
 
 /** Define PIO pins driving LED matrix rows.  */
 const pio_t rows[] = {

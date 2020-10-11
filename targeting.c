@@ -1,12 +1,21 @@
+/**
+ * @file   targeting.c
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions regarding the targeting for
+ * shooting the other player's ships and viewing your own ships and
+ * their currently inflicted hits.
+ */
+
 #include "targeting.h"
 #include "matrix_display.h"
-
 #include "navswitch.h"
 #include "ledmat.h"
 #include "led.h"
 #include "pacer.h"
 #include "button.h"
 #include "ir_uart.h"
+
 
 /**
  * Displays the player's ships and shows what parts of ships have been sunk

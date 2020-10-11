@@ -1,3 +1,12 @@
+/**
+ * @file   matrix_display.h
+ * @author Griffin Baxter, Mitchell Veale
+ * @date   11 Oct 2020
+ * @brief  Module responsible for functions and constants regarding the
+ * matrix display, which is used for displaying ships, shot markers and
+ * text.
+ */
+
 #ifndef MATRIX_DISPLAY_H
 #define MATRIX_DISPLAY_H
 
