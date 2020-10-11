@@ -13,16 +13,16 @@
 
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t rows[] = {
-    LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
-    LEDMAT_ROW4_PIO, LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO,
-    LEDMAT_ROW7_PIO
+        LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
+        LEDMAT_ROW4_PIO, LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO,
+        LEDMAT_ROW7_PIO
 };
 
 
 /** Define PIO pins driving LED matrix columns.  */
 static const pio_t cols[] = {
-    LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
-    LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
+        LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
+        LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
 };
 
 static void display_column(uint8_t row_pattern, uint8_t current_column)
@@ -48,6 +48,10 @@ static void clearScreen(void)
 {
     for (int i = 0; i < 7; i++) {
         pio_output_high(rows[i]);
+    }
+
+    for (int i = 0; i < 5; i++) {
+        pio_output_high(cols[i]);
     }
 }
 
@@ -262,21 +266,29 @@ char setupPlayerOrder(void)
 }
 
 
-void shoot(uint8_t* shotRow, uint8_t* shotCol)
+void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask)
 {
     uint8_t currentRow = 6;
     uint8_t currentCol = 0;
+    uint8_t currentMaskDisplayColumn = 0;
 
     ledmat_init();
     pacer_init(500);
 
     while (1) {
-        pacer_wait();
 
         pio_output_low(rows[currentRow]);
         pio_output_low(cols[currentCol]);
 
+        pacer_wait();
+
         clearScreen();
+
+        currentMaskDisplayColumn++;
+        if (currentMaskDisplayColumn > 4) {
+            currentMaskDisplayColumn = 0;
+        }
+
         navswitch_update();
 
         if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
@@ -307,7 +319,7 @@ void shoot(uint8_t* shotRow, uint8_t* shotCol)
             }
         }
 
-        if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
+        if (navswitch_push_event_p(NAVSWITCH_PUSH) && !((shotMask[currentCol] >> currentRow) & 1)) {
             pio_output_high(rows[currentRow]);
             pio_output_high(cols[currentCol]);
 
@@ -316,30 +328,40 @@ void shoot(uint8_t* shotRow, uint8_t* shotCol)
 
             break;
         }
+
+
+        display_column(shotMask[currentMaskDisplayColumn], currentMaskDisplayColumn);
+        clearScreen();
+
+        if ((shotMask[currentCol] >> currentRow) & 1) {
+            led_set(0, 0);
+        } else {
+            led_set(0, 1);
+        }
+
     }
 }
 
 
-void sendPos(uint8_t* shotRow, uint8_t* shotCol)
+void sendPos(uint8_t *shotRow, uint8_t *shotCol)
 {
     ir_uart_putc(*shotRow * 5 + *shotCol);
 }
 
 
-void displayText(char* text)
+void displayText(char *text)
 {
-    tinygl_init (500);
-    tinygl_font_set (&font5x7_1);
-    tinygl_text_speed_set (10);
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    tinygl_init(500);
+    tinygl_font_set(&font5x7_1);
+    tinygl_text_speed_set(10);
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
     tinygl_text(text);
 
-    pacer_init (500);
+    pacer_init(500);
 
     uint16_t count = 0;
 
-    while(1)
-    {
+    while (1) {
         pacer_wait();
         tinygl_update();
 
@@ -368,7 +390,7 @@ void waitHitConfirmation(void)
 }
 
 
-void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
+void waitTurn(uint8_t *shotRow, uint8_t *shotCol)
 {
     uint8_t rowCol = 0;
     while (1) {
@@ -382,13 +404,13 @@ void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
 }
 
 
-void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* frame1)
+void checkHit(uint8_t *shotRow, uint8_t *shotCol, uint8_t *frame1)
 {
     ir_uart_putc((frame1[*shotCol] >> *shotRow) & 1);
 }
 
 
-void changePlayerNum(uint8_t* playerNum)
+void changePlayerNum(uint8_t *playerNum)
 {
     if (*playerNum == 0) {
         *playerNum = 1;
@@ -408,6 +430,8 @@ int main(void)
     // ships
     uint8_t frame1[5] = {0, 0, 0, 0, 0};
 
+    uint8_t shotMask[5] = {0, 0, 0, 0, 0};
+
     movePlaceShip(4, frame1);
     movePlaceShip(3, frame1);
     movePlaceShip(2, frame1);
@@ -426,7 +450,8 @@ int main(void)
     while (1) {
         clearScreen();
         if (playerNum == 0) {
-            shoot(&shotRow, &shotCol);
+            shoot(&shotRow, &shotCol, shotMask);
+            shotMask[shotCol] |= (1 << shotRow);
             sendPos(&shotRow, &shotCol);
             waitHitConfirmation();
         } else {
