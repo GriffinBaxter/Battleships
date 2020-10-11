@@ -1,6 +1,6 @@
 /**
  * @file   ship_place.c
- * @author Griffin Baxter, Mitchell Veale
+ * @author Griffin Baxter (grb96), Mitchell Veale (mjv43)
  * @date   11 Oct 2020
  * @brief  Module responsible for functions regarding the moving and
  * placement of ships during the setup phase of the game.

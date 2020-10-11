@@ -1,6 +1,6 @@
 /**
  * @file   targeting.c
- * @author Griffin Baxter, Mitchell Veale
+ * @author Griffin Baxter (grb96), Mitchell Veale (mjv43)
  * @date   11 Oct 2020
  * @brief  Module responsible for functions regarding the targeting for
  * shooting the other player's ships and viewing your own ships and

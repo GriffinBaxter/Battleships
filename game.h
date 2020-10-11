@@ -1,6 +1,6 @@
 /**
  * @file   game.h
- * @author Griffin Baxter, Mitchell Veale
+ * @author Griffin Baxter (grb96), Mitchell Veale (mjv43)
  * @date   11 Oct 2020
  * @brief  The main module of the game, responsible for the main loop
  * of the game including setup and turn-by-turn shooting of
