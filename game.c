@@ -18,9 +18,7 @@
 #include "matrix_display.h"
 #include "targeting.h"
 #include "waiting.h"
-
-// Constant for the number of hits required to win the game.
-#define NUM_HIT_WIN 9
+#include "game.h"
 
 
 /** 
