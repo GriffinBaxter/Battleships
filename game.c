@@ -249,8 +249,17 @@ char setupPlayerOrder()
     }
 
     if (playerNum == 0) {
-        ir_uart_putc(1);
-        led_set(0, 0);
+        while (1) {
+            ir_uart_putc(1);
+
+            if (ir_uart_read_ready_p()) {
+                if (ir_uart_getc() == 0) {
+                    break;
+                }
+            }
+        }
+    } else {
+        ir_uart_putc(0);
     }
 
     return playerNum;
