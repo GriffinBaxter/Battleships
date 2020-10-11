@@ -324,9 +324,7 @@ void shoot(uint8_t* shotRow, uint8_t* shotCol)
 
 void sendPos(uint8_t* shotRow, uint8_t* shotCol)
 {
-    ir_uart_putc(*shotRow);
-    // delay is probably needed here.
-    ir_uart_putc(*shotCol);
+    ir_uart_putc(*shotRow * 5 + *shotCol);
 }
 
 
@@ -374,24 +372,21 @@ void displayText(char* text)
 
 void waitTurn(uint8_t* shotRow, uint8_t* shotCol)
 {
+    uint8_t rowCol = 0;
     while (1) {
         if (ir_uart_read_ready_p()) {
-            *shotRow = ir_uart_getc();
+            rowCol = ir_uart_getc();
             break;
         }
     }
-    *shotCol = ir_uart_getc();
+    *shotRow = rowCol / 5;
+    *shotCol = rowCol % 5;
 }
 
 
 void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* frame1)
 {
-    // need to implement check for if ship has been hit
-    if (1) {
-        ir_uart_putc(1);
-    } else {
-        ir_uart_putc(0);
-    }
+    ir_uart_putc(frame1[*shotCol] >> *shotRow);
 }
 
 
@@ -431,6 +426,7 @@ int main(void)
 
     // will change to a "end game" condition rather than infinite loop
     while (1) {
+        clearScreen();
         if (playerNum == 0) {
             shoot(&shotRow, &shotCol);
             sendPos(&shotRow, &shotCol);
