@@ -3,11 +3,8 @@
 #include "ledmat.h"
 #include "led.h"
 #include "pacer.h"
-#include "pio.h"
 #include "button.h"
 #include "ir_uart.h"
-#include "tinygl.h"
-#include "../../fonts/font5x7_1.h"
 
 #include "ship_place.h"
 #include "matrix_display.h"
@@ -87,12 +84,7 @@ int main(void)
     movePlaceShip(SHIP2_LENGTH, shipMask);
     movePlaceShip(SHIP3_LENGTH, shipMask);
 
-    // below onwards, not tested properly yet
-
     uint8_t playerNum = setupPlayerOrder();
-
-    // TEST
-    //uint8_t playerNum = 0;
 
     uint8_t shotRow = 0;
     uint8_t shotCol = 0;
@@ -100,7 +92,6 @@ int main(void)
     uint8_t numHits = 0;
     uint8_t enemyHits = 0;
 
-    // will change to a "end game" condition rather than infinite loop
     while (numHits != NUM_HIT_WIN && enemyHits != NUM_HIT_WIN) {
         clearScreen();
         if (playerNum == 0) {

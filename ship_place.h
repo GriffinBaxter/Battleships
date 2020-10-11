@@ -2,7 +2,6 @@
 #define SHIP_PLACE_H
 
 #include "system.h"
-#include "pio.h"
 
 #define SHIP1_LENGTH 4
 #define SHIP2_LENGTH 3

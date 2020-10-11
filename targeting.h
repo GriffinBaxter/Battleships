@@ -2,7 +2,6 @@
 #define TARGETING_H
 
 #include "system.h"
-#include "pio.h"
 
 void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask);
 

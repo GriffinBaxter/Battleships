@@ -1,7 +1,6 @@
 #include "ship_place.h"
 #include "matrix_display.h"
 
-#include "system.h"
 #include "navswitch.h"
 #include "ledmat.h"
 #include "led.h"

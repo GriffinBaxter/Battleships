@@ -1,16 +1,11 @@
 #include "targeting.h"
 #include "matrix_display.h"
 
-#include "system.h"
 #include "navswitch.h"
 #include "ledmat.h"
 #include "led.h"
-#include "pacer.h"
-#include "pio.h"
 #include "button.h"
 #include "ir_uart.h"
-#include "tinygl.h"
-#include "../../fonts/font5x7_1.h"
 
 
 void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
@@ -32,7 +27,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
         }
 
         button_update();
-        if (button_push_event_p(0)){
+        if (button_push_event_p(0)) {
             clearScreen();
             break;
         }

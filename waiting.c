@@ -1,16 +1,8 @@
 #include "waiting.h"
 #include "matrix_display.h"
 
-#include "system.h"
-#include "navswitch.h"
-#include "ledmat.h"
-#include "led.h"
-#include "pacer.h"
-#include "pio.h"
-#include "button.h"
 #include "ir_uart.h"
 #include "tinygl.h"
-#include "../../fonts/font5x7_1.h"
 
 
 void waitHitConfirmation(uint8_t* numHits)
