@@ -250,6 +250,7 @@ char setupPlayerOrder()
 
     if (playerNum == 0) {
         ir_uart_putc(1);
+        led_set(0, 0);
     }
 
     return playerNum;
