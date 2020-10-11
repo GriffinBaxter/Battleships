@@ -1,0 +1,53 @@
+BATTLESHIPS
+
+Author: Griffin Baxter, Mitchell Veale
+
+
+
+SETUP
+
+Ensure that both funkits are turned on and have loaded the game with the "make
+program" command in the terminal. Next, ensure that both funkits are facing
+such that the IR reciever is facing the other's IR transmitter, and vica versa.
+
+
+PLAYING THE GAME
+
+First of all, the position of all three of your ships must be chosen, in order
+of four, three and two dots wide. For each ship, move the placement of it by
+using the north, east, south and west directions of the navigation switch. To
+rotate the ship, press down on the navigation switch. To place a ship, press
+the standalone button on the funkit. Once each ship has been placed, a dim
+outline of the previously placed ship(s) are shown, and when the current ship
+being placed is overlapping one of the previous ships, the blue LED light will
+switch off, and will switch back on once no longer overlapping, indicating that
+it is able to be placed in the given spot. The next step is to either wait for
+the other player to choose their ship positions, or to continue on.
+
+Next, the main loop of the game will start. The player which chose their ship
+positions first will take their turn first, while the other player will wait
+for the other to take their turn.
+
+The player taking their turn first chooses where to shoot their shot. This
+player can move around the target via the north, east, south and west
+directions of the navigation switch. Positions where the player has previously
+shot are marked by dim spots on the matrix display, and these positions cannot
+be shot again (as the player has already hit or missed here). Additionally, the
+player can press the standalone button to swap to a view of their own ship
+positions, with their own ships hit by the other player diplayed with a dim
+brightness. This view is a toggle, and can be switched back and forth from the
+shooting view and ship position views by pressing the standalone button. In the
+shooting view, a shot can be taken by pressing down on the navigation switch.
+Once a shot has been taken, a message will appear on the display saying either
+"HIT!" or "MISS", indicating whether the shot was a hit or a miss. The player
+that just shot will then be waiting for the next player to take their shot, and
+so on.
+
+Once a player has shot all of the other player's ships (9 dots in total on the
+display), the game will show a message on both funkits. One will display the
+message "WIN!", indicating a win for shooting all of the other player's ships,
+and the other will display the message "LOSS", indicating a loss.
+
+The game can be restarted by pressing the reset button on each funkit, and
+repeating the steps above including the setup section.
+
