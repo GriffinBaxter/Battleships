@@ -9,9 +9,28 @@
 
 #include "system.h"
 
-// Constant for the number of hits required to win the game.
+/** Constant for the number of hits required to win the game. */
 #define NUM_HIT_WIN 9
 
+/** Constants for the player numbers depending on the current turn. */
+#define SHOOTING_PLAYER_NUM 0
+#define WAITING_PLAYER_NUM 1
+
+/** Macro for getting a single integer from row and column values. */
+#define singleIntRowCol *shotRow * 5 + *shotCol
+
+/**
+ * Macro for checking if one of the current player's ships was hit by
+ * the other player, generates 1 if hit, 0 otherwise.
+ */
+#define isHit (shipMask[*shotCol] >> *shotRow) & 1
+
+/**
+ * Macros for updating the masks/outlines of previous shots by yourself
+ * or by ships hit by the other player.
+ */
+#define updateShotMask shotMask[shotCol] |= (1 << shotRow)
+#define updateEnemyShotMask enemyShotMask[shotCol] |= (1 << shotRow)
 
 /** 
  * Function for setting the player order of the main game loop, the

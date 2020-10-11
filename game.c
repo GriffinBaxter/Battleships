@@ -30,20 +30,20 @@
  */
 char setupPlayerOrder(void)
 {
-    char playerNum = 0;
+    char playerNum = SHOOTING_PLAYER_NUM;
 
     if (ir_uart_read_ready_p()) {
         playerNum = ir_uart_getc();
 
-        ir_uart_putc(0);
+        ir_uart_putc(SHOOTING_PLAYER_NUM);
     }
 
-    if (playerNum == 0) {
-        ir_uart_putc(1);
+    if (playerNum == SHOOTING_PLAYER_NUM) {
+        ir_uart_putc(WAITING_PLAYER_NUM);
 
         while (1) {
             if (ir_uart_read_ready_p()) {
-                if (ir_uart_getc() == 0) {
+                if (ir_uart_getc() == SHOOTING_PLAYER_NUM) {
                     break;
                 }
             }
@@ -62,7 +62,7 @@ char setupPlayerOrder(void)
  */
 void sendPos(uint8_t *shotRow, uint8_t *shotCol)
 {
-    ir_uart_putc(*shotRow * 5 + *shotCol);
+    ir_uart_putc(singleIntRowCol);
 }
 
 
@@ -78,7 +78,7 @@ void sendPos(uint8_t *shotRow, uint8_t *shotCol)
  */
 void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipMask, uint8_t* enemyHits)
 {
-    uint8_t hit = (shipMask[*shotCol] >> *shotRow) & 1;
+    uint8_t hit = isHit;
     ir_uart_putc(hit);
     if (hit) {
         *enemyHits += 1;
@@ -139,14 +139,14 @@ int main(void)
     // Main loop
     while (numHits != NUM_HIT_WIN && enemyHits != NUM_HIT_WIN) {
         clearScreen();
-        if (playerNum == 0) {
+        if (playerNum == SHOOTING_PLAYER_NUM) {
             shoot(&shotRow, &shotCol, shotMask, shipMask, enemyShotMask);
-            shotMask[shotCol] |= (1 << shotRow);
+            updateShotMask;
             sendPos(&shotRow, &shotCol);
             waitHitConfirmation(&numHits);
         } else {
             waitTurn(&shotRow, &shotCol);
-            enemyShotMask[shotCol] |= (1 << shotRow);
+            updateEnemyShotMask;
             checkHit(&shotRow, &shotCol, shipMask, &enemyHits);
         }
         changePlayerNum(&playerNum);

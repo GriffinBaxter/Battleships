@@ -24,9 +24,9 @@
  */
 void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
 {
-    //ship is horizontal
-    if (!IS_VERTICAL(*position)) {
-        // is the ship out of the left bound?
+    if (!IS_VERTICAL(*position)) { // Ship is horizontal.
+        
+        // Checking if the ship is out of the left bound.
         if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position % TOTAL_COLS == 0) {
             *position += 1;
         } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position % TOTAL_COLS == TOTAL_COLS - 1) {
@@ -43,8 +43,9 @@ void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
                 mask[i] |= BIT_LEFT(*position / TOTAL_COLS);
             }
         }
-    } else { /* Ship is vertical */
-        // is the ship out of the top bound
+    } else { // Ship is vertical.
+        
+        // Checking if the ship is out of the top bound.
         if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position - ROTATION_BIT < TOTAL_COLS) {
             *position += TOTAL_COLS;
         } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position - ROTATION_BIT > 29) {
@@ -71,7 +72,7 @@ void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
  */
 void moveShipUp(uint8_t *mask, uint8_t *position)
 {
-    // first check if we can move the ship
+    // Checking if the ship can be moved.
     for (int i = 0; i < TOTAL_COLS; i++) {
         if (mask[i] & 1) {
             return;

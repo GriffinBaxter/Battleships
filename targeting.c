@@ -31,7 +31,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
         pacer_wait();
         clearScreen();
 
-        // display dead bits of ship
+        // Displaying the dead bits of ship.
         displayColumn(shipMask[current_column] & enemyHitMask[current_column], current_column);
         clearScreen();
 
@@ -46,7 +46,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
             break;
         }
 
-        // display alive bits of ship
+        // Displaying the alive bits of ship.
         displayColumn(shipMask[current_column] & ~(enemyHitMask[current_column]), current_column);
     }
 }
