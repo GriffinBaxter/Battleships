@@ -1,6 +1,6 @@
 # File:   Makefile
 # Author: Mitchell Veale, Griffin Baxter
-# Date:   3 October 2020
+# Date:   11 October 2020
 # Descr:  Makefile for game
 
 # Definitions.
