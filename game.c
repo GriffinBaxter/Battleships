@@ -8,13 +8,9 @@
 #include "ir_uart.h"
 #include "tinygl.h"
 #include "../../fonts/font5x7_1.h"
-#include "shipPlace.h"
 
-#define BUTTON_PIO PD7_PIO
-
-#define SHIP1_LENGTH 4
-#define SHIP2_LENGTH 3
-#define SHIP3_LENGTH 2
+#include "ship_place.h"
+#include "matrix_display.h"
 
 #define NUM_HIT_WIN 9
 

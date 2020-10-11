@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../drivers/avr/timer.h ../../drivers/ledmat.h ../../drivers/button.h ../../drivers/led.h ../../drivers/navswitch.h shipPlace.h
+game.o: game.c ../../drivers/avr/system.h ../../drivers/avr/pio.h ../../utils/pacer.h ../../drivers/avr/timer.h ../../drivers/ledmat.h ../../drivers/button.h ../../drivers/led.h ../../drivers/navswitch.h ship_place.h matrix_display.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -64,12 +64,15 @@ font.o: ../../utils/font.c ../../drivers/avr/system.h ../../utils/font.h
 display.o: ../../drivers/display.c ../../drivers/avr/system.h ../../drivers/display.h ../../drivers/ledmat.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-shipPlace.o: shipPlace.c ../../drivers/avr/pio.h ../../drivers/avr/system.h shipPlace.h
+ship_place.o: ship_place.c ../../drivers/avr/pio.h ../../drivers/avr/system.h ship_place.h matrix_display.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+matrix_display.o: matrix_display.c ../../drivers/avr/pio.h ../../drivers/avr/system.h matrix_display.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o pio.o pacer.o timer.o ledmat.o button.o led.o navswitch.o ir_uart.o usart1.o timer0.o prescale.o tinygl.o font.o display.o shipPlace.o
+game.out: game.o system.o pio.o pacer.o timer.o ledmat.o button.o led.o navswitch.o ir_uart.o usart1.o timer0.o prescale.o tinygl.o font.o display.o ship_place.o matrix_display.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 
