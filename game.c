@@ -15,6 +15,8 @@
 #define SHIP2_LENGTH 3
 #define SHIP3_LENGTH 2
 
+#define NUM_HIT_WIN 9
+
 /** Define PIO pins driving LED matrix rows.  */
 static const pio_t rows[] = {
         LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO,
@@ -378,14 +380,14 @@ void displayText(char *text)
 }
 
 
-void waitHitConfirmation(uint8_t* win)
+void waitHitConfirmation(uint8_t* numHits)
 {
     while (1) {
         if (ir_uart_read_ready_p()) {
             tinygl_clear();
             if (ir_uart_getc() == 1) {
                 displayText("HIT!");
-                *win = 1;
+                *numHits++;
             } else {
                 displayText("MISS");
             }
@@ -409,9 +411,13 @@ void waitTurn(uint8_t *shotRow, uint8_t *shotCol)
 }
 
 
-void checkHit(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shipMask)
+void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipMask, uint8_t* enemyHits)
 {
-    ir_uart_putc((shipMask[*shotCol] >> *shotRow) & 1);
+    uint8_t hit = (shipMask[*shotCol] >> *shotRow) & 1;
+    ir_uart_putc(hit);
+    if (hit) {
+        enemyHits++;
+    }
 }
 
 
@@ -451,24 +457,25 @@ int main(void)
     uint8_t shotRow = 0;
     uint8_t shotCol = 0;
 
-    uint8_t win = 0;
+    uint8_t numHits = 0;
+    uint8_t enemyHits = 0;
 
     // will change to a "end game" condition rather than infinite loop
-    while (win == 0) {
+    while (numHits != NUM_HIT_WIN && enemyHits != NUM_HIT_WIN) {
         clearScreen();
         if (playerNum == 0) {
             shoot(&shotRow, &shotCol, shotMask);
             shotMask[shotCol] |= (1 << shotRow);
             sendPos(&shotRow, &shotCol);
-            waitHitConfirmation(&win);
+            waitHitConfirmation(&numHits);
         } else {
             waitTurn(&shotRow, &shotCol);
-            checkHit(&shotRow, &shotCol, shipMask);
+            checkHit(&shotRow, &shotCol, shipMask, &enemyHits);
         }
         changePlayerNum(&playerNum);
     }
 
-    if (playerNum == 1) {
+    if (numHits == NUM_HIT_WIN) {
         displayText("WIN!");
     } else {
         displayText("LOSS!");
