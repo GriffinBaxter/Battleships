@@ -246,20 +246,20 @@ char setupPlayerOrder()
 
     if (ir_uart_read_ready_p()) {
         playerNum = ir_uart_getc();
+
+        ir_uart_putc(0);
     }
 
     if (playerNum == 0) {
-        while (1) {
-            ir_uart_putc(1);
+        ir_uart_putc(1);
 
+        while (1) {
             if (ir_uart_read_ready_p()) {
                 if (ir_uart_getc() == 0) {
                     break;
                 }
             }
         }
-    } else {
-        ir_uart_putc(0);
     }
 
     return playerNum;
