@@ -15,6 +15,11 @@
 #define SHIP2_LENGTH 3
 #define SHIP3_LENGTH 2
 
+#define IS_VERTICAL(X) ((X) >> 7)
+#define ROTATION_BIT 128
+
+#define BIT_LEFT(X) (1 << (X))
+
 /**
  * Places ship of given length and given position in given bitmask, ensuring that the given position is valid and would
  * not result in the ship being placed of screen by modifying the position as needed

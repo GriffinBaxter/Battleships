@@ -45,7 +45,7 @@ void displayColumn(uint8_t rowPattern, uint8_t currentColumn)
         return;
     }
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < TOTAL_ROWS; i++) {
         (rowPattern >> i) & 1 ? pio_output_low(rows[i]) : pio_output_high(rows[i]);
     }
 
@@ -57,11 +57,11 @@ void displayColumn(uint8_t rowPattern, uint8_t currentColumn)
  */
 void clearScreen(void)
 {
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < TOTAL_ROWS; i++) {
         pio_output_high(rows[i]);
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < TOTAL_COLS; i++) {
         pio_output_high(cols[i]);
     }
 }

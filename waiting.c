@@ -48,6 +48,6 @@ void waitTurn(uint8_t *shotRow, uint8_t *shotCol)
             break;
         }
     }
-    *shotRow = rowCol / 5;
-    *shotCol = rowCol % 5;
+    *shotRow = rowCol / TOTAL_COLS;
+    *shotCol = rowCol % TOTAL_COLS;
 }

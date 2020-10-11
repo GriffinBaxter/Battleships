@@ -15,6 +15,9 @@
 
 #define BUTTON_PIO PD7_PIO
 
+#define TOTAL_ROWS 7
+#define TOTAL_COLS 5
+
 /** Define PIO pins driving LED matrix rows.  */
 extern const pio_t rows[];
 

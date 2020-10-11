@@ -25,40 +25,40 @@
 void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
 {
     //ship is horizontal
-    if (!(*position >> 7)) {
+    if (!IS_VERTICAL(*position)) {
         // is the ship out of the left bound?
-        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position % 5 == 0) {
+        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position % TOTAL_COLS == 0) {
             *position += 1;
-        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position % 5 == 4) {
+        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position % TOTAL_COLS == TOTAL_COLS - 1) {
             *position -= 1;
-        } else if (length == SHIP3_LENGTH && *position % 5 >= 3) {
-            *position -= 3 - (5 - (*position % 5));
+        } else if (length == SHIP3_LENGTH && *position % TOTAL_COLS >= TOTAL_COLS - 2) {
+            *position -= 3 - (MAX-TOTAL_COLS - (*position % TOTAL_COLS));
         }
-        if (length == 2) {
-            for (int i = *position % 5; i < length + (*position % 5); i++) {
-                mask[i] |= (1 << (*position / 5));
+        if (length == SHIP3_LENGTH) {
+            for (int i = *position % TOTAL_COLS; i < length + (*position % TOTAL_COLS); i++) {
+                mask[i] |= BIT_LEFT(*position / TOTAL_COLS);
             }
         } else {
-            for (int i = (*position % 5) - 1; i < length + (*position % 5) - 1; i++) {
-                mask[i] |= (1 << (*position / 5));
+            for (int i = (*position % TOTAL_COLS) - 1; i < length + (*position % TOTAL_COLS) - 1; i++) {
+                mask[i] |= BIT_LEFT(*position / TOTAL_COLS);
             }
         }
     } else { /* Ship is vertical */
         // is the ship out of the top bound
-        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position - 128 < 5) {
-            *position += 5;
-        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position - 128 > 29) {
-            *position -= 5;
-        } else if (length == SHIP1_LENGTH && *position - 128 > 24) {
-            *position -= 5 * (3 - (7 - ((*position - 128) / 5)));
+        if ((length == SHIP2_LENGTH || length == SHIP1_LENGTH) && *position - ROTATION_BIT < TOTAL_COLS) {
+            *position += TOTAL_COLS;
+        } else if ((length == SHIP3_LENGTH || length == SHIP2_LENGTH) && *position - ROTATION_BIT > 29) {
+            *position -= TOTAL_COLS;
+        } else if (length == SHIP1_LENGTH && *position - ROTATION_BIT > 24) {
+            *position -= TOTAL_COLS * (3 - (TOTAL_ROWS - ((*position - ROTATION_BIT) / TOTAL_COLS)));
         }
-        if (length == 2) {
-            for (int i = (*position - 128) / 5; i < ((*position - 128) / 5) + length; i++) {
-                mask[(*position - 128) % 5] |= (1 << i);
+        if (length == SHIP3_LENGTH) {
+            for (int i = (*position - ROTATION_BIT) / TOTAL_COLS; i < ((*position - ROTATION_BIT) / TOTAL_COLS) + length; i++) {
+                mask[(*position - ROTATION_BIT) % TOTAL_COLS] |= BIT_LEFT(i);
             }
         } else {
-            for (int i = ((*position - 128) / 5) - 1; i < length + ((*position - 128) / 5) - 1; i++) {
-                mask[(*position - 128) % 5] |= (1 << i);
+            for (int i = ((*position - ROTATION_BIT) / TOTAL_COLS) - 1; i < length + ((*position - ROTATION_BIT) / TOTAL_COLS) - 1; i++) {
+                mask[(*position - ROTATION_BIT) % TOTAL_COLS] |= BIT_LEFT(i);
             }
         }
     }
@@ -72,14 +72,14 @@ void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
 void moveShipUp(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < TOTAL_COLS; i++) {
         if (mask[i] & 1) {
             return;
         }
     }
 
-    *position -= 5;
-    for (int i = 0; i < 5; i++) {
+    *position -= TOTAL_COLS;
+    for (int i = 0; i < TOTAL_COLS; i++) {
         mask[i] >>= 1;
     }
 }
@@ -92,14 +92,14 @@ void moveShipUp(uint8_t *mask, uint8_t *position)
 void moveShipDown(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
-    for (int i = 0; i < 5; i++) {
-        if (mask[i] & (1 << 6)) {
+    for (int i = 0; i < TOTAL_COLS; i++) {
+        if (mask[i] & BIT_LEFT(6)) {
             return;
         }
     }
 
-    *position += 5;
-    for (int i = 0; i < 5; i++) {
+    *position += TOTAL_COLS;
+    for (int i = 0; i < TOTAL_COLS; i++) {
         mask[i] <<= 1;
     }
 }
@@ -117,10 +117,10 @@ void moveShipLeft(uint8_t *mask, uint8_t *position)
     }
 
     *position -= 1;
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < TOTAL_COLS; i++) {
         mask[i - 1] = mask[i];
     }
-    mask[4] = 0;
+    mask[TOTAL_COLS - 1] = 0;
 }
 
 /**
@@ -131,12 +131,12 @@ void moveShipLeft(uint8_t *mask, uint8_t *position)
 void moveShipRight(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
-    if (mask[4] != 0) {
+    if (mask[TOTAL_COLS - 1] != 0) {
         return;
     }
 
     *position += 1;
-    for (int i = 4; i > 0; i--) {
+    for (int i = TOTAL_COLS - 1; i > 0; i--) {
         mask[i] = mask[i - 1];
     }
     mask[0] = 0;
@@ -150,7 +150,7 @@ void moveShipRight(uint8_t *mask, uint8_t *position)
  */
 char checkBitmaskCollision(uint8_t *mask1, uint8_t *mask2)
 {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < TOTAL_COLS; i++) {
         if ((mask1[i] & mask2[i]) != 0) {
             return 1;
         }
@@ -187,7 +187,7 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
 
         clearScreen();
         currentColumn++;
-        if (currentColumn > 4) {
+        if (currentColumn > TOTAL_COLS - 1) {
             currentColumn = 0;
         }
 
@@ -209,8 +209,8 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
         }
 
         if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-            shipPosition ^= 1 << 7;
-            for (int i = 0; i < 5; i++) {
+            shipPosition ^= BIT_LEFT(7);
+            for (int i = 0; i < TOTAL_COLS; i++) {
                 currentShipMask[i] = 0;
             }
             placeShip(currentShipMask, &shipPosition, shipLength);
@@ -230,7 +230,7 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
 
         button_update();
         if (button_push_event_p(0) && !checkBitmaskCollision(shipMask, currentShipMask)) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < TOTAL_COLS; i++) {
                 shipMask[i] |= currentShipMask[i];
             }
             break;

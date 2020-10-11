@@ -36,7 +36,7 @@ void viewShips(uint8_t* shipMask, uint8_t* enemyHitMask) {
         clearScreen();
 
         current_column++;
-        if (current_column > 4) {
+        if (current_column > TOTAL_COLS) {
             current_column = 0;
         }
 
@@ -79,7 +79,7 @@ void shoot(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shotMask, uint8_t* shipM
         clearScreen();
 
         currentMaskDisplayColumn++;
-        if (currentMaskDisplayColumn > 4) {
+        if (currentMaskDisplayColumn > TOTAL_COLS - 1) {
             currentMaskDisplayColumn = 0;
         }
 
