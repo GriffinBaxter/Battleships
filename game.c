@@ -55,7 +55,7 @@ static void clearScreen(void)
     }
 }
 
-static void placeShip(uint8_t *frame, uint8_t *position, uint8_t length)
+static void placeShip(uint8_t *mask, uint8_t *position, uint8_t length)
 {
     //ship is horizontal
     if (!(*position >> 7)) {
@@ -69,11 +69,11 @@ static void placeShip(uint8_t *frame, uint8_t *position, uint8_t length)
         }
         if (length == 2) {
             for (int i = *position % 5; i < length + (*position % 5); i++) {
-                frame[i] |= (1 << (*position / 5));
+                mask[i] |= (1 << (*position / 5));
             }
         } else {
             for (int i = (*position % 5) - 1; i < length + (*position % 5) - 1; i++) {
-                frame[i] |= (1 << (*position / 5));
+                mask[i] |= (1 << (*position / 5));
             }
         }
     } else { /* Ship is vertical */
@@ -87,78 +87,78 @@ static void placeShip(uint8_t *frame, uint8_t *position, uint8_t length)
         }
         if (length == 2) {
             for (int i = (*position - 128) / 5; i < ((*position - 128) / 5) + length; i++) {
-                frame[(*position - 128) % 5] |= (1 << i);
+                mask[(*position - 128) % 5] |= (1 << i);
             }
         } else {
             for (int i = ((*position - 128) / 5) - 1; i < length + ((*position - 128) / 5) - 1; i++) {
-                frame[(*position - 128) % 5] |= (1 << i);
+                mask[(*position - 128) % 5] |= (1 << i);
             }
         }
     }
 }
 
-static void moveShipUp(uint8_t *frame, uint8_t *position)
+static void moveShipUp(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
     for (int i = 0; i < 5; i++) {
-        if (frame[i] & 1) {
+        if (mask[i] & 1) {
             return;
         }
     }
 
     *position -= 5;
     for (int i = 0; i < 5; i++) {
-        frame[i] >>= 1;
+        mask[i] >>= 1;
     }
 }
 
-static void moveShipDown(uint8_t *frame, uint8_t *position)
+static void moveShipDown(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
     for (int i = 0; i < 5; i++) {
-        if (frame[i] & (1 << 6)) {
+        if (mask[i] & (1 << 6)) {
             return;
         }
     }
 
     *position += 5;
     for (int i = 0; i < 5; i++) {
-        frame[i] <<= 1;
+        mask[i] <<= 1;
     }
 }
 
-static void moveShipLeft(uint8_t *frame, uint8_t *position)
+static void moveShipLeft(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
-    if (frame[0] != 0) {
+    if (mask[0] != 0) {
         return;
     }
 
     *position -= 1;
     for (int i = 1; i < 5; i++) {
-        frame[i - 1] = frame[i];
+        mask[i - 1] = mask[i];
     }
-    frame[4] = 0;
+    mask[4] = 0;
 }
 
-static void moveShipRight(uint8_t *frame, uint8_t *position)
+static void moveShipRight(uint8_t *mask, uint8_t *position)
 {
     // first check if we can move the ship
-    if (frame[4] != 0) {
+    if (mask[4] != 0) {
         return;
     }
 
     *position += 1;
     for (int i = 4; i > 0; i--) {
-        frame[i] = frame[i - 1];
+        mask[i] = mask[i - 1];
     }
-    frame[0] = 0;
+    mask[0] = 0;
 }
 
-static char checkFrameCollision(uint8_t *frame1, uint8_t *frame2)
+static char checkFrameCollision(uint8_t *mask1, uint8_t *mask2)
 {
     for (int i = 0; i < 5; i++) {
-        if ((frame1[i] & frame2[i]) != 0) {
+        if ((mask1[i] & mask2[i]) != 0) {
             return 1;
         }
     }
@@ -166,7 +166,7 @@ static char checkFrameCollision(uint8_t *frame1, uint8_t *frame2)
 }
 
 
-void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
+void movePlaceShip(uint8_t shipLength, uint8_t *shipMask)
 {
     ledmat_init();
     pacer_init(500);
@@ -175,13 +175,13 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
     uint8_t current_column = 0;
 
     //bright frame
-    uint8_t frame2[5] = {0, 0, 0, 0, 0};
+    uint8_t currentShipMask[5] = {0, 0, 0, 0, 0};
 
     // first bit is for rotation, second is 0, rest is location
     uint8_t shipPosition = 0b00011110;
 
     // first battle ship
-    placeShip(frame2, &shipPosition, shipLength);
+    placeShip(currentShipMask, &shipPosition, shipLength);
 
     while (1) {
         system_init();
@@ -195,44 +195,44 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
 
         navswitch_update();
         if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-            moveShipUp(frame2, &shipPosition);
+            moveShipUp(currentShipMask, &shipPosition);
         }
 
         if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-            moveShipDown(frame2, &shipPosition);
+            moveShipDown(currentShipMask, &shipPosition);
         }
 
         if (navswitch_push_event_p(NAVSWITCH_EAST)) {
-            moveShipRight(frame2, &shipPosition);
+            moveShipRight(currentShipMask, &shipPosition);
         }
 
         if (navswitch_push_event_p(NAVSWITCH_WEST)) {
-            moveShipLeft(frame2, &shipPosition);
+            moveShipLeft(currentShipMask, &shipPosition);
         }
 
         if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
             shipPosition ^= 1 << 7;
             for (int i = 0; i < 5; i++) {
-                frame2[i] = 0;
+                currentShipMask[i] = 0;
             }
-            placeShip(frame2, &shipPosition, shipLength);
+            placeShip(currentShipMask, &shipPosition, shipLength);
         }
 
         // Display shipFrame for a split second so that it is very dim
-        display_column(shipFrame[current_column], current_column);
+        display_column(shipMask[current_column], current_column);
         clearScreen();
 
-        display_column(frame2[current_column], current_column);
+        display_column(currentShipMask[current_column], current_column);
 
-        if (checkFrameCollision(shipFrame, frame2)) {
+        if (checkFrameCollision(shipMask, currentShipMask)) {
             led_set(0, 0);
         } else {
             led_set(0, 1);
         }
 
-        if (pio_input_get(BUTTON_PIO) && !checkFrameCollision(shipFrame, frame2)) {
+        if (pio_input_get(BUTTON_PIO) && !checkFrameCollision(shipMask, currentShipMask)) {
             for (int i = 0; i < 5; i++) {
-                shipFrame[i] |= frame2[i];
+                shipMask[i] |= currentShipMask[i];
             }
             break;
         }
@@ -405,9 +405,9 @@ void waitTurn(uint8_t *shotRow, uint8_t *shotCol)
 }
 
 
-void checkHit(uint8_t *shotRow, uint8_t *shotCol, uint8_t *frame1)
+void checkHit(uint8_t *shotRow, uint8_t *shotCol, uint8_t *shipMask)
 {
-    ir_uart_putc((frame1[*shotCol] >> *shotRow) & 1);
+    ir_uart_putc((shipMask[*shotCol] >> *shotRow) & 1);
 }
 
 
@@ -429,13 +429,13 @@ int main(void)
     ir_uart_init();
 
     // ships
-    uint8_t frame1[5] = {0, 0, 0, 0, 0};
+    uint8_t shipMask[5] = {0, 0, 0, 0, 0};
 
     uint8_t shotMask[5] = {0, 0, 0, 0, 0};
 
-    movePlaceShip(4, frame1);
-    movePlaceShip(3, frame1);
-    movePlaceShip(2, frame1);
+    movePlaceShip(4, shipMask);
+    movePlaceShip(3, shipMask);
+    movePlaceShip(2, shipMask);
 
     // below onwards, not tested properly yet
 
@@ -459,7 +459,7 @@ int main(void)
             waitHitConfirmation(&win);
         } else {
             waitTurn(&shotRow, &shotCol);
-            checkHit(&shotRow, &shotCol, frame1);
+            checkHit(&shotRow, &shotCol, shipMask);
         }
         changePlayerNum(&playerNum);
     }
