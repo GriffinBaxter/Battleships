@@ -387,7 +387,7 @@ void waitHitConfirmation(uint8_t* numHits)
             tinygl_clear();
             if (ir_uart_getc() == 1) {
                 displayText("HIT!");
-                *numHits++;
+                *numHits += 1;
             } else {
                 displayText("MISS");
             }
@@ -416,7 +416,7 @@ void checkHit(uint8_t* shotRow, uint8_t* shotCol, uint8_t* shipMask, uint8_t* en
     uint8_t hit = (shipMask[*shotCol] >> *shotRow) & 1;
     ir_uart_putc(hit);
     if (hit) {
-        enemyHits++;
+        *enemyHits += 1;
     }
 }
 
