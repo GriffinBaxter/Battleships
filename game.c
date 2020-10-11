@@ -352,13 +352,14 @@ void displayText(char* text)
 }
 
 
-void waitHitConfirmation(void)
+void waitHitConfirmation(uint8_t* win)
 {
     while (1) {
         if (ir_uart_read_ready_p()) {
             tinygl_clear();
             if (ir_uart_getc() == 1) {
                 displayText("HIT!");
+                *win = 1;
             } else {
                 displayText("MISS");
             }
@@ -422,17 +423,25 @@ int main(void)
     uint8_t shotRow = 0;
     uint8_t shotCol = 0;
 
+    uint8_t win = 0;
+
     // will change to a "end game" condition rather than infinite loop
-    while (1) {
+    while (win == 0) {
         clearScreen();
         if (playerNum == 0) {
             shoot(&shotRow, &shotCol);
             sendPos(&shotRow, &shotCol);
-            waitHitConfirmation();
+            waitHitConfirmation(&win);
         } else {
             waitTurn(&shotRow, &shotCol);
             checkHit(&shotRow, &shotCol, frame1);
         }
         changePlayerNum(&playerNum);
+    }
+
+    if (playerNum == 1) {
+        displayText("WIN!");
+    } else {
+        displayText("LOSS!");
     }
 }
