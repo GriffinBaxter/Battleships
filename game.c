@@ -249,17 +249,7 @@ char setupPlayerOrder()
     }
 
     if (playerNum == 0) {
-        while (1) {
-            ir_uart_putc(1);
-
-            if (ir_uart_read_ready_p()) {
-                if (ir_uart_getc() == 0) {
-                    break;
-                }
-            }
-        }
-    } else {
-        ir_uart_putc(0);
+        ir_uart_putc(1);
     }
 
     return playerNum;
@@ -270,53 +260,54 @@ void shoot(uint8_t* shotRow, uint8_t* shotCol)
 {
     uint8_t currentRow = 6;
     uint8_t currentCol = 0;
-    
+
     ledmat_init();
     pacer_init(500);
-    
+
     while (1) {
         pacer_wait();
-        
+
         pio_output_low(rows[currentRow]);
         pio_output_low(cols[currentCol]);
-        
+
+        clearScreen();
         navswitch_update();
-        
+
         if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
             if (currentRow != 0) {
                 pio_output_high(rows[currentRow]);
                 currentRow--;
             }
         }
-        
+
         if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
             if (currentRow != 6) {
                 pio_output_high(rows[currentRow]);
                 currentRow++;
             }
         }
-        
+
         if (navswitch_push_event_p(NAVSWITCH_EAST)) {
             if (currentCol != 4) {
                 pio_output_high(cols[currentCol]);
                 currentCol++;
             }
         }
-        
+
         if (navswitch_push_event_p(NAVSWITCH_WEST)) {
             if (currentCol != 0) {
                 pio_output_high(cols[currentCol]);
                 currentCol--;
             }
         }
-        
+
         if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
             pio_output_high(rows[currentRow]);
             pio_output_high(cols[currentCol]);
-            
+
             *shotRow = currentRow;
             *shotCol = currentCol;
-            
+
             break;
         }
     }
@@ -354,7 +345,7 @@ void displayText(char* text)
     tinygl_text_speed_set (10);
     tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
     tinygl_text(text);
-    
+
     pacer_init (500);
 
     uint16_t count = 0;
@@ -363,12 +354,12 @@ void displayText(char* text)
     {
         pacer_wait();
         tinygl_update();
-        
+
         if (count++ >= 2500) {
             break;
         }
     }
-    
+
     clearScreen();
 }
 
@@ -423,10 +414,10 @@ int main(void)
     // below onwards, not tested properly yet
 
     uint8_t playerNum = setupPlayerOrder();
-    
+
     // TEST
     //uint8_t playerNum = 0;
-    
+
     uint8_t shotRow = 0;
     uint8_t shotCol = 0;
 
