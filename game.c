@@ -176,8 +176,6 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
     // first bit is for rotation, second is 0, rest is location
     uint8_t shipPosition = 0b00011110;
 
-    // TODO: Figure out a better name for this
-    uint8_t frameNumber = 0;
     // first battle ship
     placeShip(frame2, &shipPosition, shipLength);
 
@@ -238,7 +236,7 @@ void movePlaceShip(uint8_t shipLength, uint8_t *shipFrame)
 }
 
 
-char setupPlayerOrder()
+char setupPlayerOrder(void)
 {
     char playerNum = 0;
 
@@ -328,22 +326,6 @@ void sendPos(uint8_t* shotRow, uint8_t* shotCol)
 }
 
 
-void waitHitConfirmation()
-{
-    while (1) {
-        if (ir_uart_read_ready_p()) {
-            tinygl_clear();
-            if (ir_uart_getc() == 1) {
-                displayText("HIT!");
-            } else {
-                displayText("MISS");
-            }
-            break;
-        }
-    }
-}
-
-
 void displayText(char* text)
 {
     tinygl_init (500);
@@ -367,6 +349,22 @@ void displayText(char* text)
     }
 
     clearScreen();
+}
+
+
+void waitHitConfirmation(void)
+{
+    while (1) {
+        if (ir_uart_read_ready_p()) {
+            tinygl_clear();
+            if (ir_uart_getc() == 1) {
+                displayText("HIT!");
+            } else {
+                displayText("MISS");
+            }
+            break;
+        }
+    }
 }
 
 
@@ -433,7 +431,7 @@ int main(void)
             waitHitConfirmation();
         } else {
             waitTurn(&shotRow, &shotCol);
-            checkHit(&shotRow, &shotCol, &frame1);
+            checkHit(&shotRow, &shotCol, frame1);
         }
         changePlayerNum(&playerNum);
     }
